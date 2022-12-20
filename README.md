@@ -1,5 +1,7 @@
 # Overview
 
+[paepche.de/codescore](https://paepcke.de/codescore)
+
 Calculate a code quality score, base on number of golang (idomatic) 
 code style violations per lines of code. Based on a specifc set of
 code-style-linter, eg. \[golang.org/lint\] \[github.com/mgechev/revive\]
