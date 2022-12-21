@@ -2,11 +2,14 @@
 
 [paepche.de/codescore](https://paepcke.de/codescore)
 
-Calculate a code quality score, base on number of golang (idomatic) 
-code style violations per lines of code. Based on a specifc set of
-code-style-linter, eg. \[golang.org/lint\] \[github.com/mgechev/revive\]
+- Calculate a code quality score
+- Based on number of golang (idomatic) code style violations per lines of code
+- 100 % golang, minimal (external) imports, use as app or api (see api.goo)
 
-100 % golang, minimal (external) imports, use as app or api (see api.goo)
+## Install 
+```
+go install paepcke.de/codescore/cmd/codescore@latest
+```
 
 # Showtime 
 
