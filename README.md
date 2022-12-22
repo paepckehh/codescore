@@ -1,4 +1,4 @@
-# Overview
+# OVERVIEW
 
 [paepche.de/codescore](https://paepcke.de/codescore)
 
@@ -6,12 +6,13 @@
 - Based on number of golang (idomatic) code style violations per lines of code
 - 100 % golang, minimal (external) imports, use as app or api (see api.goo)
 
-## Install 
+# INSTALL
+
 ```
 go install paepcke.de/codescore/cmd/codescore@latest
 ```
 
-# Showtime 
+# SHOWTIME 
 
 ## Summary one-liner!
 
@@ -59,3 +60,7 @@ syntax: codescore [options] <file|directory>
 --debug [-d]
 --help [-h]
 ```
+
+# CONTRIBUTION
+
+Yes, Please! PRs Welcome! 
