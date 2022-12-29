@@ -12,6 +12,10 @@
 go install paepcke.de/codescore/cmd/codescore@latest
 ```
 
+# DOWNLOAD (prebuild)
+
+[github.com/paepckehh/codescore/releases](https://github.com/paepckehh/codescore/releases)
+
 # SHOWTIME 
 
 ## Summary one-liner!
