@@ -88,7 +88,7 @@ func main() {
 
 const (
 	_syntax string = "syntax: codescore [options] <file|directory>\n\n--file [-f]\n\t\tcreate .go.codescore info file\n\n--file-full [-F]\n\t\tcreate .go.codescore info file and dump all details into the file\n\n--score-only [-s]\n\t\tprint only the score to stdout\n\n--enable-hidden-files [-e]\n\t\tenable scanning hidden files and directories\n\n--exclude [-e]\n\t\texclude all directories matching any of the keywords\n\t\tthis option can be specified several times\n\n--verbose [-v]\n--silent [-q]\n--debug [-d]\n--help [-h]\n"
-	_empty         = ""
+	_empty  string = ""
 )
 
 //

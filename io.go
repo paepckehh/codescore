@@ -22,9 +22,6 @@ func out(msg string) {
 // Error Display IO
 //
 
-// var
-var silent bool
-
 // errOut ...
 func errOut(msg string) {
 	out("[error] " + msg + "\n")
