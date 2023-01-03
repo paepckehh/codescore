@@ -77,17 +77,26 @@ func (c *Config) writeScoreFile(sum result) {
 	case c.Goo:
 		file = _slashfwd + _fileGoo
 		c.cleanScoreFiles()
-		os.WriteFile(c.Path+file+itoaFixed(sum.score), []byte(itoaFixed(sum.score)), 0o644)
+		err := os.WriteFile(c.Path+file+itoaFixed(sum.score), []byte(itoaFixed(sum.score)), 0o644)
+		if err != nil {
+			errOut("unable to write: " + err.Error())
+		}
 	case c.File:
 		c.cleanScoreFiles()
-		os.WriteFile(c.Path+file+itoaFixed(sum.score), []byte(itoaFixed(sum.score)), 0o644)
+		err := os.WriteFile(c.Path+file+itoaFixed(sum.score), []byte(itoaFixed(sum.score)), 0o644)
+		if err != nil {
+			errOut("unable to write: " + err.Error())
+		}
 	case c.FileFull:
 		report := []byte(c.scoreReport(sum))
 		if len(sum.details) > 0 {
 			report = append(report, []byte("\n"+sum.details)...)
 		}
 		c.cleanScoreFiles()
-		os.WriteFile(c.Path+file+itoaFixed(sum.score), report, 0o644)
+		err := os.WriteFile(c.Path+file+itoaFixed(sum.score), report, 0o644)
+		if err != nil {
+			errOut("unable to write: " + err.Error())
+		}
 	}
 }
 
