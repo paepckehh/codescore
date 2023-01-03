@@ -7,7 +7,6 @@ package codescore
 
 import (
 	"os"
-	"syscall"
 )
 
 const (
@@ -16,10 +15,6 @@ const (
 )
 
 func (c *Config) fastWalker() {
-	fi, err := os.Stat(c.Path)
-	if err != nil {
-		errExit("[stat deviceID root dir] [" + c.Path + "] [" + err.Error() + "]")
-	}
 	exclude := false
 	if len(c.Exclude) > 0 {
 		exclude = true
@@ -27,7 +22,6 @@ func (c *Config) fastWalker() {
 	skipme := false
 	for i := 0; i < 1; i++ {
 		go func() {
-			inodeSeen := make(map[uint64]struct{})
 			for path := range channelDir {
 				list, err := os.ReadDir(path)
 				if err != nil {
@@ -36,7 +30,6 @@ func (c *Config) fastWalker() {
 					continue
 				}
 				for _, item := range list {
-					fi, _ := item.Info()
 					fname := item.Name()
 					if c.SkipHidden {
 						if fname[0] == '.' {
