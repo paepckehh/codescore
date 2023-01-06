@@ -109,7 +109,9 @@ func (c *Config) cleanScoreFiles() {
 			case len(name) != 18:
 				continue
 			case name[:15] == _fileGoo:
-				syscall.Unlink(c.Path + "/" + name)
+				if err := syscall.Unlink(c.Path + "/" + name); err != nil {
+					errOut("unable to unlink: " + name + " " + err.Error())
+				}
 			}
 		}
 		return
@@ -122,7 +124,9 @@ func (c *Config) cleanScoreFiles() {
 		case len(name) != 14:
 			continue
 		case name[:11] == _file:
-			syscall.Unlink(c.Path + "/" + name)
+			if err := syscall.Unlink(c.Path + "/" + name); err != nil {
+				errOut("unable to unlink: " + name + " " + err.Error())
+			}
 		}
 	}
 }
