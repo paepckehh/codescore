@@ -1,6 +1,6 @@
 # OVERVIEW
 
-[paepche.de/codescore](https://paepcke.de/codescore)
+[paepche.de/codescore](https://paepcke.de/codescore/)
 
 - Calculate a code quality score
 - Based on number of golang (idomatic) code style violations per lines of code
