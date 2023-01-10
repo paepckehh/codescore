@@ -65,6 +65,10 @@ syntax: codescore [options] <file|directory>
 --help [-h]
 ```
 
+# DOCS
+
+[pkg.go.dev/paepcke.de/codescore](https://pkg.go.dev/paepcke.de/codescore)
+
 # CONTRIBUTION
 
 Yes, Please! PRs Welcome! 
