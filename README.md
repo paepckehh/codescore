@@ -1,4 +1,5 @@
 # OVERVIEW
+[![Go Report Card](https://goreportcard.com/badge/paepcke.de/codescore)](https://goreportcard.com/report/paepcke.de/codescore)
 
 [paepche.de/codescore](https://paepcke.de/codescore/)
 
