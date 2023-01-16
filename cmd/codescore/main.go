@@ -56,7 +56,7 @@ func main() {
 						errExit("exclude switch value missing")
 					}
 				default:
-					errExit("unkown commandline switch [" + o + "]")
+					errExit("unknown commandline switch [" + o + "]")
 				}
 			case o == ".", o == "*":
 				if c.Path != _empty {
