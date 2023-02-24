@@ -1,7 +1,7 @@
 # OVERVIEW
 [![Go Reference](https://pkg.go.dev/badge/paepcke.de/codescore.svg)](https://pkg.go.dev/paepcke.de/codescore) [![Go Report Card](https://goreportcard.com/badge/paepcke.de/codescore)](https://goreportcard.com/report/paepcke.de/codescore) [![Go Build](https://github.com/paepckehh/codescore/actions/workflows/golang.yml/badge.svg)](https://github.com/paepckehh/codescore/actions/workflows/golang.yml)
 
-[paepche.de/codescore](https://paepcke.de/codescore/)
+[paepcke.de/codescore](https://paepcke.de/codescore/)
 
 - Calculate a code quality score
 - Based on number of golang (idomatic) code style violations per lines of code
