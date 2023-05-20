@@ -2,7 +2,7 @@ module paepcke.de/codescore
 
 go 1.20
 
-require github.com/mgechev/revive v1.3.1
+require github.com/mgechev/revive v1.3.2
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
@@ -17,5 +17,5 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	golang.org/x/tools v0.9.1 // indirect
 )
