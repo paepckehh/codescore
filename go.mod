@@ -1,6 +1,6 @@
 module paepcke.de/codescore
 
-go 1.22.3
+go 1.21
 
 require github.com/mgechev/revive v1.3.7
 
