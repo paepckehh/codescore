@@ -53,7 +53,6 @@ var lintRules = []lint.Rule{
 	&rule.StructTagRule{},
 	&rule.ConstantLogicalExprRule{},
 	&rule.BoolLiteralRule{},
-	&rule.ImportsBlacklistRule{},
 	&rule.RangeValInClosureRule{},
 	&rule.RangeValAddress{},
 	&rule.WaitGroupByValueRule{},
