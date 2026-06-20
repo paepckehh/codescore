@@ -2,128 +2,177 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"paepcke.de/codescore"
 )
 
-// func main ...
-func main() {
-	c := codescore.GetDefaultConfig()
-	l := len(os.Args)
-	var opt string
-	switch {
-	case l > 1:
-		for i := 1; i < l; i++ {
-			o := os.Args[i]
-			switch {
-			case o[0] == '-':
-				switch {
-				case o == "--file" || o == "-f":
-					c.File = true
-					opt += "[--file] "
-				case o == "--file-full" || o == "-F":
-					c.FileFull = true
-					opt += "[--file-full] "
-				case o == "--help" || o == "-h":
-					out(_syntax)
-					os.Exit(0)
-				case o == "--verbose" || o == "-v":
-					c.Verbose = true
-					opt += "[--verbose] "
-				case o == "--silent" || o == "-q":
-					c.Silent = true
-					opt += "[--silent] "
-				case o == "--debug" || o == "-d":
-					c.Debug = true
-					opt += "[--debug] "
-				case o == "--enable-hidden-files" || o == "-e":
-					c.SkipHidden = false
-					opt += "[--enable-hidden-files] "
-				case o == "--score-only" || o == "-s":
-					c.ScoreOnly = true
-					opt += "[--score-only] "
-				case o == "--goo" || o == "-g":
-					c.Goo = true
-					opt += "[--goo] "
-				case o == "--exclude" || o == "-e":
-					i++
-					switch {
-					case i < l:
-						c.Exclude = append(c.Exclude, os.Args[i])
-						opt += "[--exclude " + os.Args[i] + "] "
-					default:
-						errExit("exclude switch value missing")
-					}
-				default:
-					errExit("unknown commandline switch [" + o + "]")
-				}
-			case o == ".", o == "*":
-				if c.Path != _empty {
-					errExit("more than one [file|directory] path specified")
-				}
-				var err error
-				if c.Path, err = os.Getwd(); err != nil {
-					errExit("unable to validate current directory path")
-				}
-			case isFile(o):
-				if c.Path != _empty {
-					errExit(" more than one [file|directory] path specified")
-				}
-				c.Path = o
-			case isDir(o):
-				if c.Path != _empty {
-					errExit("more than one [file|directory] path specified")
-				}
-				c.Path = o
-			default:
-				errExit("invalid path or option [" + o + "]")
-			}
-		}
-		out(c.Start())
-	default:
-		out(_syntax)
-	}
+// usage holds the help text for the CLI.
+var usage = `usage: codescore [options] <path>
+
+Options:
+
+     --file, -f               Create .go.codescore info file
+     --file-full, -F          Create .go.codescore file with details
+     --score-only, -s         Print only the score to stdout
+     --enable-hidden-files, -e
+                             Enable scanning hidden files and directories
+     --exclude <dir>          Exclude directories matching <dir> (repeatable)
+     --verbose, -v            Verbose output
+     --silent, -q             Silent output
+     --debug, -d              Debug output
+     --goo, -g                Goo mode
+     --version, -V            Print version information
+     --help, -h               Show this help
+
+Targets:
+     <path>                   File or directory to score;
+                              "." or "*" are aliases for current directory
+                              No target defaults to current directory
+Version:
+` + Version() + "\n"
+
+// excludeFlag implements flag.Value for repeatable --exclude flags.
+type excludeFlag []string
+
+func (e *excludeFlag) String() string { return strings.Join(*e, ",") }
+func (e *excludeFlag) Set(v string) error {
+	*e = append(*e, v)
+	return nil
 }
 
-const (
-	_syntax string = "syntax: codescore [options] <file|directory>\n\n--file [-f]\n\t\tcreate .go.codescore info file\n\n--file-full [-F]\n\t\tcreate .go.codescore info file and dump all details into the file\n\n--score-only [-s]\n\t\tprint only the score to stdout\n\n--enable-hidden-files [-e]\n\t\tenable scanning hidden files and directories\n\n--exclude [-e]\n\t\texclude all directories matching any of the keywords\n\t\tthis option can be specified several times\n\n--verbose [-v]\n--silent [-q]\n--debug [-d]\n--help [-h]\n"
-	_empty  string = ""
-)
+// expandArgs transforms os.Args so the flag package can parse them:
+//   - Expands compound short flags (-vd → -v -d)
+//   - Maps -h to --help
+func expandArgs(args []string) []string {
+	out := make([]string, 0, len(args)*2)
+	for _, arg := range args {
+		if len(arg) >= 2 && arg[0] == '-' && arg[1] != '-' {
+			for i := 1; i < len(arg); i++ {
+				out = append(out, "-"+string(arg[i]))
+			}
+		} else if arg == "-h" || arg == "--help" {
+			out = append(out, "--help")
+		} else {
+			out = append(out, arg)
+		}
+	}
+	return out
+}
 
-//
-// LITTLE GENERIC HELPER SECTION
-//
+// run performs all CLI logic: flag parsing, validation, and scoring.
+func run() (string, error) {
+	c := codescore.GetDefaultConfig()
 
-const (
-	_modeDir uint32 = 1 << (32 - 1 - 0)
-)
+	var excludes excludeFlag
 
-// out ...
+	flagSet := flag.NewFlagSet("codescore", flag.ContinueOnError)
+	flagSet.SetOutput(io.Discard)
+	flagSet.Usage = func() {}
+
+	// Boolean flags — default is current value from GetDefaultConfig().
+	flagSet.BoolVar(&c.File, "file", c.File, "create .go.codescore info file")
+	flagSet.BoolVar(&c.File, "f", c.File, "")
+	flagSet.BoolVar(&c.FileFull, "file-full", c.FileFull, "create .go.codescore file with details")
+	flagSet.BoolVar(&c.FileFull, "F", c.FileFull, "")
+	flagSet.BoolVar(&c.ScoreOnly, "score-only", c.ScoreOnly, "print only the score")
+	flagSet.BoolVar(&c.ScoreOnly, "s", c.ScoreOnly, "")
+	flagSet.BoolVar(&c.SkipHidden, "enable-hidden-files", c.SkipHidden, "enable scanning hidden files and directories")
+	flagSet.BoolVar(&c.SkipHidden, "e", c.SkipHidden, "")
+	flagSet.BoolVar(&c.Verbose, "verbose", c.Verbose, "verbose output")
+	flagSet.BoolVar(&c.Verbose, "v", c.Verbose, "")
+	flagSet.BoolVar(&c.Silent, "silent", c.Silent, "silent mode")
+	flagSet.BoolVar(&c.Silent, "q", c.Silent, "")
+	flagSet.BoolVar(&c.Debug, "debug", c.Debug, "debug output")
+	flagSet.BoolVar(&c.Debug, "d", c.Debug, "")
+	flagSet.BoolVar(&c.Goo, "goo", c.Goo, "goo mode")
+	flagSet.BoolVar(&c.Goo, "g", c.Goo, "")
+
+	versionFlag := flagSet.Bool("version", false, "print version information")
+	_ = flagSet.Bool("V", false, "print version information")
+
+	// --exclude is long-flag only; no short alias to avoid collision with -e.
+	flagSet.Var(&excludes, "exclude", "exclude directories by keyword (repeatable)")
+
+	help := flagSet.Bool("help", false, "show this help")
+
+	if err := flagSet.Parse(expandArgs(os.Args[1:])); err != nil {
+		return "", err
+	}
+
+	if *help {
+		fmt.Print(usage)
+		os.Exit(0)
+	}
+
+	if *versionFlag {
+		out(Version())
+		os.Exit(0)
+	}
+
+	positionals := flagSet.Args()
+	if len(positionals) == 0 {
+		fmt.Print(usage)
+		os.Exit(0)
+	}
+
+	if len(positionals) > 1 {
+		return "", fmt.Errorf("more than one [file|directory] path specified")
+	}
+
+	path := positionals[0]
+	switch path {
+	case ".", "*":
+		var err error
+		if path, err = os.Getwd(); err != nil {
+			return "", fmt.Errorf("unable to get current working directory [%s] [%s]", path, err)
+		}
+	}
+
+	c.Path = path
+	c.Exclude = excludes
+
+	// Validate that path is a regular file or directory.
+	fi, err := os.Stat(path)
+	if err != nil {
+		return "", fmt.Errorf("invalid target [directory|file] [%s] {%s}", path, err)
+	}
+	if !fi.Mode().IsRegular() && !fi.Mode().IsDir() {
+		return "", fmt.Errorf("[invalid target] [%s]", path)
+	}
+
+	return c.Start(), nil
+}
+
+func main() {
+	// Pre-check for --help anywhere in args since flag.Parse stops at
+	// the first non-flag positional argument.
+	for _, arg := range os.Args[1:] {
+		switch arg {
+		case "--help", "-h":
+			fmt.Print(usage)
+			os.Exit(0)
+		case "--version", "-V":
+			out(Version())
+			os.Exit(0)
+		}
+	}
+
+	result, err := run()
+	if err != nil {
+		out("[error] " + err.Error())
+		os.Exit(1)
+	}
+	out(result)
+}
+
+// ---- CLI helpers ----
+
+// out writes a message to stdout.
 func out(msg string) {
 	os.Stdout.Write([]byte(msg))
-}
-
-// errExit ...
-func errExit(msg string) {
-	out("[error] " + msg)
-	os.Exit(1)
-}
-
-// isDir ...
-func isDir(filename string) bool {
-	fi, err := os.Stat(filename)
-	if err != nil {
-		return false
-	}
-	return uint32(fi.Mode())&_modeDir != 0
-}
-
-// isFile ...
-func isFile(filename string) bool {
-	fi, err := os.Lstat(filename)
-	if err != nil {
-		return false
-	}
-	return fi.Mode().IsRegular()
 }

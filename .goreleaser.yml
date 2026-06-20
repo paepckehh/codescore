@@ -5,6 +5,11 @@ builds:
     main: ./cmd/codescore/main.go
     env:
       - CGO_ENABLED=0
+    ldflags:
+         - -s -w
+         - -X main.version={{ .Version }}
+         - -X main.commit={{ .FullCommit }}
+         - -X main.date={{ .Timestamp }}
     goos:
       - linux
       - freebsd
