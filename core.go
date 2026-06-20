@@ -120,7 +120,7 @@ func (c *Config) scorePath() result {
 
 // scoreWorker ...
 func scoreWorker() {
-	for i := 0; i < worker; i++ {
+	for range worker {
 		go func() {
 			config := lintConfig()
 			for filename := range channelGoFiles {
@@ -149,12 +149,12 @@ func scoreFile(filename string, config *lint.Config) result {
 	if err != nil {
 		errOut(err.Error())
 	}
-	var output string
+	var output strings.Builder
 	for failure := range failures {
-		output += fmt.Sprintf("%v: %s\n", failure.Position.Start, failure.Failure)
+		output.WriteString(fmt.Sprintf("%v: %s\n", failure.Position.Start, failure.Failure))
 	}
-	errCount := countLines([]byte(output))
-	return result{100 - (100 * errCount / loc), loc, errCount, output}
+	errCount := countLines([]byte(output.String()))
+	return result{100 - (100 * errCount / loc), loc, errCount, output.String()}
 }
 
 // countFileLoc ...
@@ -173,7 +173,7 @@ func countFileLoc(filename string) int {
 // countLines ...
 func countLines(in []byte) int {
 	size, lines := len(in), 0
-	for i := 0; i < size; i++ {
+	for i := range size {
 		if in[i] == _linefeed {
 			lines++
 		}

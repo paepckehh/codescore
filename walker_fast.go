@@ -4,6 +4,7 @@ package codescore
 
 import (
 	"os"
+	"slices"
 	"syscall"
 )
 
@@ -27,7 +28,7 @@ func (c *Config) fastWalker() {
 	}
 	skipme := false
 	rootNodeDeviceID := uint64(d.Dev)
-	for i := 0; i < 1; i++ {
+	for range 1 {
 		go func() {
 			inodeSeen := make(map[uint64]struct{})
 			for path := range channelDir {
@@ -61,13 +62,7 @@ func (c *Config) fastWalker() {
 							continue // skip dirtargets outside fs boundary
 						}
 						if exclude {
-							skipme = false
-							for _, exclude := range c.Exclude {
-								if fname == exclude {
-									skipme = true
-									break // skip exclude list
-								}
-							}
+							skipme = slices.Contains(c.Exclude, fname)
 							if skipme {
 								continue
 							}

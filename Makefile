@@ -9,6 +9,9 @@ deps:
 	go mod tidy -v	
 
 check: 
+	gofumpt -w .
 	gofmt -w -s .
+	go fix ./...
+	go vet ./...
 	staticcheck
 	make -C cmd/$(PROJECT) check
