@@ -18,6 +18,10 @@ run:
 	go build -ldflags "$(LDFLAGS)" -o codescore .
 	./codescore
 
+ast:
+	go build -ldflags "$(LDFLAGS)" -o codescore .
+	./codescore -a main.go
+
 build:
 	go build -ldflags "$(LDFLAGS)" -o codescore .
 

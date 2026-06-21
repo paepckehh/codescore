@@ -26,6 +26,7 @@ Options:
      --silent, -q             Silent output
      --debug, -d              Debug output
      --goo, -g                Goo mode
+     --ast, -a                Print AST of the specified Go source file
      --version, -V            Print version information
      --help, -h               Show this help
 
@@ -91,6 +92,8 @@ func run() (string, error) {
 	flagSet.BoolVar(&c.Debug, "d", c.Debug, "")
 	flagSet.BoolVar(&c.Goo, "goo", c.Goo, "goo mode")
 	flagSet.BoolVar(&c.Goo, "g", c.Goo, "")
+	astFlag := flagSet.Bool("ast", false, "print AST of the specified Go source file")
+	astAlias := flagSet.Bool("a", false, "print AST of the specified Go source file")
 
 	versionFlag := flagSet.Bool("version", false, "print version information")
 	_ = flagSet.Bool("V", false, "print version information")
@@ -143,6 +146,17 @@ func run() (string, error) {
 	}
 	if !fi.Mode().IsRegular() && !fi.Mode().IsDir() {
 		return "", fmt.Errorf("[invalid target] [%s]", path)
+	}
+
+	if *astFlag || *astAlias {
+		if !fi.Mode().IsRegular() {
+			return "", fmt.Errorf("[ast mode requires a Go source file, not] [%s]", path)
+		}
+		result, err := codescore.ASTSerialize(path)
+		if err != nil {
+			return "", fmt.Errorf("failed to serialize AST [%s] {%s}", path, err)
+		}
+		return result, nil
 	}
 
 	return c.Start(), nil
